@@ -7,15 +7,82 @@
 			padding: 0;
 			overflow: hidden;
 		}
+
+		form {
+		position: absolute;
+      max-width: 400px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 20px;
+      border: 1px solid #dddddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #dddddd;
+      border-radius: 4px;
+    }
+
+    input[type="button"] {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #4caf50;
+      color: #ffffff;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type="button"]:hover {
+      background-color: #45a049;
+    }
 	</style>
-	<title>Flower</title>
+	<title>Math Tricks</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 	<meta charset="UTF-8"></meta> <!-- allows for cyrillic and other exotic text in console.logs -->
 </head>
 
 <body onload="init()">
+	<form id="myForm">
+		<label for="textfield1">Field width(in x):</label>
+		<input type="text" id="textfield1" name="textfield1" required><br><br>
+	
+		<label for="textfield2">Field height(in y):</label>
+		<input type="text" id="textfield2" name="textfield2" required><br><br>
+	
+		<input type="button" value="GO!" onclick="submitForm()">
+	  </form>
+ 	
 	<canvas id="canvas-id" width=window.innerWidth height=window.innerHeight></canvas>
 	<script>
+		var gameStart = false
+		function submitForm() {
+      var textField1 = document.getElementById("textfield1").value;
+      var textField2 = document.getElementById("textfield2").value;
+      console.log("Field width(in x): " + textField1);
+      console.log("Field height(in y): " + textField2);
+	  if (!/^\d+$/.test(textField1) || !/^\d+$/.test(textField2)) {
+        alert("Please enter valid numbers without decimal places.");
+        return;
+      }
+	  fieldWidth = textField1;
+	  fieldHeight = textField2;
+	  gameStart = true
+	  var formElement = document.getElementById("myForm");
+      formElement.parentNode.removeChild(formElement);
+    }
 		function areColliding(Ax, Ay, Awidth, Aheight, Bx, By, Bwidth, Bheight) {
 			if (Bx <= Ax + Awidth) {
 				if (Ax <= Bx + Bwidth) {
