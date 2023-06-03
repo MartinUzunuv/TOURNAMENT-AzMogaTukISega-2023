@@ -61,6 +61,9 @@
 	
 		<label for="textfield2">Field height(in y):</label>
 		<input type="text" id="textfield2" name="textfield2" required><br><br>
+
+		<label for="checkbox">Singleplayer:</label>
+    <input type="checkbox" id="checkbox" name="checkbox"><br><br>
 	
 		<input type="button" value="GO!" onclick="submitForm()">
 	  </form>
@@ -71,6 +74,7 @@
 		function submitForm() {
       var textField1 = document.getElementById("textfield1").value;
       var textField2 = document.getElementById("textfield2").value;
+	  singleplayer = document.getElementById("checkbox").checked;
       console.log("Field width(in x): " + textField1);
       console.log("Field height(in y): " + textField2);
 	  if (!/^\d+$/.test(textField1) || !/^\d+$/.test(textField2)) {

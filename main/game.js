@@ -1,83 +1,86 @@
 times = 0;
 
-function initialize(){
-//initialize the field
-// fieldWidth = 20;
-// fieldHeight = 20;
-
-sideDistY = 0;
-sideDistX = 0;
-
-sectorSize =
-  window.innerWidth < window.innerHeight
-    ? window.innerWidth / fieldWidth
-    : window.innerHeight / fieldHeight;
-
-if (fieldWidth * sectorSize > window.innerWidth) {
-  sectorSize = window.innerWidth / fieldWidth;
-}
-
-if (fieldHeight * sectorSize > window.innerHeight) {
-  sectorSize = window.innerHeight / fieldHeight;
-}
-
-if (window.innerWidth < window.innerHeight) {
-  let fieldSize = fieldHeight * sectorSize;
-  sideDistY = (window.innerHeight - fieldSize) / 2;
-}
-
-if (window.innerWidth > window.innerHeight) {
-  let fieldSize = fieldWidth * sectorSize;
-  sideDistX = (window.innerWidth - fieldSize) / 2;
-}
-
-field = [];
-
-//fill the field with starting values
-for (let x = 0; x < fieldWidth; x++) {
-  field.push([]);
-  for (let y = 0; y < fieldHeight; y++) {
-    //0 - empty
-    //1 - blue
-    //1.5 - blue's
-    //2 - green
-    //2.5 - green's
-    field[x].push({ type: 0, value: Math.floor(Math.random() * 10) });
+function initialize() {
+  if (singleplayer) {
+    console.log("singleplayer:" + singleplayer);
   }
-}
+  //initialize the field
+  // fieldWidth = 20;
+  // fieldHeight = 20;
 
-for (let x = 0; x < fieldWidth; x++) {
-  for (let y = 0; y < fieldHeight; y++) {
-    let operation = Math.random();
-    if (operation < 0.25) {
-      field[x][y].operation = "+";
-    } else if (operation < 0.5) {
-      field[x][y].operation = "-";
-    } else if (operation < 0.75) {
-      field[x][y].operation = "*";
-    } else {
-      field[x][y].operation = "/";
-      if(field[x][y].value === 0){
-        field[x][y].operation = "+"
+  sideDistY = 0;
+  sideDistX = 0;
+
+  sectorSize =
+    window.innerWidth < window.innerHeight
+      ? window.innerWidth / fieldWidth
+      : window.innerHeight / fieldHeight;
+
+  if (fieldWidth * sectorSize > window.innerWidth) {
+    sectorSize = window.innerWidth / fieldWidth;
+  }
+
+  if (fieldHeight * sectorSize > window.innerHeight) {
+    sectorSize = window.innerHeight / fieldHeight;
+  }
+
+  if (window.innerWidth < window.innerHeight) {
+    let fieldSize = fieldHeight * sectorSize;
+    sideDistY = (window.innerHeight - fieldSize) / 2;
+  }
+
+  if (window.innerWidth > window.innerHeight) {
+    let fieldSize = fieldWidth * sectorSize;
+    sideDistX = (window.innerWidth - fieldSize) / 2;
+  }
+
+  field = [];
+
+  //fill the field with starting values
+  for (let x = 0; x < fieldWidth; x++) {
+    field.push([]);
+    for (let y = 0; y < fieldHeight; y++) {
+      //0 - empty
+      //1 - blue
+      //1.5 - blue's
+      //2 - green
+      //2.5 - green's
+      field[x].push({ type: 0, value: Math.floor(Math.random() * 10) });
+    }
+  }
+
+  for (let x = 0; x < fieldWidth; x++) {
+    for (let y = 0; y < fieldHeight; y++) {
+      let operation = Math.random();
+      if (operation < 0.25) {
+        field[x][y].operation = "+";
+      } else if (operation < 0.5) {
+        field[x][y].operation = "-";
+      } else if (operation < 0.75) {
+        field[x][y].operation = "*";
+      } else {
+        field[x][y].operation = "/";
+        if (field[x][y].value === 0) {
+          field[x][y].operation = "+";
+        }
       }
     }
   }
-}
 
-field[0][0] = { type: 1, value: 0, operation: "" };
+  field[0][0] = { type: 1, value: 0, operation: "" };
 
-field[fieldWidth - 1][fieldHeight - 1] = { type: 2, value: 0, operation: "" };
+  field[fieldWidth - 1][fieldHeight - 1] = { type: 2, value: 0, operation: "" };
 
-currentPlayer = 1;
+  currentPlayer = 1;
 
-blueScore = 0;
-greenScore = 0;
+  blueScore = 0;
+  greenScore = 0;
 
-gameEnd = false;
+  gameEnd = false;
 }
 
 function draw() {
-  if (gameStart&&times > 0) {
+  if (gameStart && times > 0) {
     if (currentPlayer === 1) {
       context.fillStyle = "#000099";
     } else {
@@ -88,12 +91,12 @@ function draw() {
 
     context.fillStyle = "white";
     context.font = `${30}px serif`;
-    context.fillText(blueScore, sectorSize * 0.5, sectorSize);
+    context.fillText(blueScore, 5, 30);
     let greenScoreString = greenScore.toString();
     context.fillText(
       greenScore,
-      window.innerWidth - sectorSize * greenScoreString.length * 0.5,
-      window.innerHeight - sectorSize * 0.3
+      window.innerWidth - 15 * greenScoreString.length,
+      window.innerHeight - 15
     );
 
     //draw the field
@@ -117,8 +120,8 @@ function draw() {
         context.fillRect(
           x * sectorSize + sideDistX,
           y * sectorSize + sideDistY,
-          sectorSize,
-          sectorSize
+          sectorSize * 0.99,
+          sectorSize * 0.99
         );
         context.fillStyle = "black";
         context.font = `${Math.floor(sectorSize * 0.5)}px serif`;
@@ -247,8 +250,71 @@ let timeBetweenMoves = 10;
 function update() {
   if (gameStart) {
     if (times > 0) {
-      //movement controls
+      if (singleplayer && currentPlayer === 2) {
+        for (let x = 0; x < fieldWidth; x++) {
+          for (let y = 0; y < fieldHeight; y++) {
+            let possiblePaths = [];
+            let onePath = false;
+            if (field[x][y].type === 2 && !onePath) {
+              for (let checkForEndX = -1; checkForEndX < 2; checkForEndX++) {
+                for (let checkForEndY = -1; checkForEndY < 2; checkForEndY++) {
+                  try {
+                    if (
+                      field[x + checkForEndX][y + checkForEndY].type === 0 &&
+                      !onePath
+                    ) {
+                      console.log(field[x + checkForEndX][y + checkForEndY].operation)
+                      if(field[x + checkForEndX][y + checkForEndY].operation === '+'){
+                        possiblePaths.push({
+                          x: x + checkForEndX,
+                          y: y + checkForEndY,
+                          value: greenScore + field[x + checkForEndX][y + checkForEndY].value,
+                        });
+                      }else if(field[x + checkForEndX][y + checkForEndY].operation === '-'){
+                        possiblePaths.push({
+                          x: x + checkForEndX,
+                          y: y + checkForEndY,
+                          value: greenScore - field[x + checkForEndX][y + checkForEndY].value,
+                        });
+                      }else if(field[x + checkForEndX][y + checkForEndY].operation === '*'){
+                        possiblePaths.push({
+                          x: x + checkForEndX,
+                          y: y + checkForEndY,
+                          value: greenScore * field[x + checkForEndX][y + checkForEndY].value,
+                        });
+                      }else{
+                        possiblePaths.push({
+                          x: x + checkForEndX,
+                          y: y + checkForEndY,
+                          value: greenScore / field[x + checkForEndX][y + checkForEndY].value,
+                        });
+                      }
+                    }
+                  } catch (e) {}
+                }
+              }
+              possiblePaths.sort((a, b) => a.value - b.value);
+              if (!onePath)
+                if (possiblePaths.length === 0) {
+                  gameEnd = true;
+                } else {
+                  console.log(possiblePaths);
+                  field[x][y].type = 2.5;
+                  field[possiblePaths[possiblePaths.length - 1].x][
+                    possiblePaths[possiblePaths.length - 1].y
+                  ].type = 2;
+                  greenScore+=field[possiblePaths[possiblePaths.length - 1].x][
+                    possiblePaths[possiblePaths.length - 1].y
+                  ].value
+                  currentPlayer = 1;
+                  onePath = true;
+                }
+            }
+          }
+        }
+      }
       if (timeBetweenMoves > 10) {
+        //movement controls
         moveOn(87, 0, -1); //w
         moveOn(65, -1, 0); //a
         moveOn(83, 0, 1); //s
@@ -262,15 +328,15 @@ function update() {
         timeBetweenMoves = 0;
       }
       timeBetweenMoves++;
-    }else{
-      initialize()
+    } else {
+      initialize();
     }
     times++;
   }
 }
 
 function mousedown() {
-  if (gameStart&&times > 0) {
+  if (gameStart && times > 0) {
     let place = {
       x: Math.floor((mouseX - sideDistX) / sectorSize),
       y: Math.floor((mouseY - sideDistY) / sectorSize),
