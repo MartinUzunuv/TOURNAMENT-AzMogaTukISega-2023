@@ -67,7 +67,7 @@ let currentPlayer = 1;
 blueScore = 0;
 greenScore = 0;
 
-gameEnd = false
+gameEnd = false;
 
 function draw() {
   if (currentPlayer === 1) {
@@ -80,9 +80,13 @@ function draw() {
 
   context.fillStyle = "white";
   context.font = `${30}px serif`;
-  context.fillText(blueScore, sectorSize*0.5, sectorSize);
-  let greenScoreString = greenScore.toString()
-  context.fillText(greenScore, window.innerWidth-sectorSize*greenScoreString.length*0.5, window.innerHeight - sectorSize*0.3);
+  context.fillText(blueScore, sectorSize * 0.5, sectorSize);
+  let greenScoreString = greenScore.toString();
+  context.fillText(
+    greenScore,
+    window.innerWidth - sectorSize * greenScoreString.length * 0.5,
+    window.innerHeight - sectorSize * 0.3
+  );
 
   //draw the field
   for (let x = 0; x < fieldWidth; x++) {
@@ -125,6 +129,19 @@ function draw() {
       }
     }
   }
+  if (gameEnd) {
+    context.fillStyle = "black";
+    context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+    if (blueScore > greenScore) {
+      context.fillStyle = "blue";
+      context.font = `${30}px serif`;
+      context.fillText('BLUE WINS WITH SCORE:'+blueScore, sectorSize * 0.5, sectorSize);
+    }else{
+      context.fillStyle = "green";
+      context.font = `${30}px serif`;
+      context.fillText('GREEN WINS WITH SCORE:'+greenScore, sectorSize * 0.5, sectorSize);
+    }
+  }
 }
 
 function moveOn(key, xChange, yChange) {
@@ -134,6 +151,21 @@ function moveOn(key, xChange, yChange) {
       for (let y = 0; y < fieldHeight; y++) {
         //what will be moved
         if (field[x][y].type === currentPlayer && !once) {
+          let blockedPaths = 0;
+          for (let checkForEndX = -1; checkForEndX < 2; checkForEndX++) {
+            for (let checkForEndY = -1; checkForEndY < 2; checkForEndY++) {
+              try {
+                if (field[x + checkForEndX][y + checkForEndY].type !== 0) {
+                  blockedPaths++;
+                }
+              } catch (e) {
+                blockedPaths++;
+              }
+            }
+          }
+          if (blockedPaths === 9) {
+            gameEnd = true;
+          }
           if (
             x >= 0 &&
             x < fieldWidth &&
@@ -146,19 +178,6 @@ function moveOn(key, xChange, yChange) {
           ) {
             if (field[x + xChange][y + yChange].type === 0) {
               once = true;
-
-              let blockedPaths = 0
-              for(let checkForEndX = -1; checkForEndX < 2; checkForEndX++) {
-                for(let checkForEndY = -1; checkForEndY < 2; checkForEndY++){
-                  try{
-                    if(field[x + checkForEndX][y + checkForEndY].type !== 0){
-                      blockedPaths++
-                    }
-                  }catch(e){
-                    blockedPaths++
-                  }
-                }
-              }
 
               if (currentPlayer === 1) {
                 field[x][y].type = 1.5;
@@ -188,7 +207,8 @@ function moveOn(key, xChange, yChange) {
                   greenScore *= field[x + xChange][y + yChange].value;
                 }
                 if (field[x + xChange][y + yChange].operation === "/") {
-                  greenScore = greenScore / field[x + xChange][y + yChange].value;
+                  greenScore =
+                    greenScore / field[x + xChange][y + yChange].value;
                 }
               }
 
@@ -235,6 +255,21 @@ function mousedown() {
     for (let y = 0; y < fieldHeight; y++) {
       //what will be moved
       if (field[x][y].type === currentPlayer && !once) {
+        let blockedPaths = 0;
+        for (let checkForEndX = -1; checkForEndX < 2; checkForEndX++) {
+          for (let checkForEndY = -1; checkForEndY < 2; checkForEndY++) {
+            try {
+              if (field[x + checkForEndX][y + checkForEndY].type !== 0) {
+                blockedPaths++;
+              }
+            } catch (e) {
+              blockedPaths++;
+            }
+          }
+        }
+        if (blockedPaths === 9) {
+          gameEnd = true;
+        }
         let xChange = place.x - x;
         let yChange = place.y - y;
         //one tile radius only
@@ -277,7 +312,7 @@ function mousedown() {
                   blueScore *= field[x + xChange][y + yChange].value;
                 }
                 if (field[x + xChange][y + yChange].operation === "/") {
-                  blueScore  = blueScore / field[x + xChange][y + yChange].value;
+                  blueScore = blueScore / field[x + xChange][y + yChange].value;
                 }
               } else {
                 field[x][y].type = 2.5;
@@ -292,7 +327,8 @@ function mousedown() {
                   greenScore *= field[x + xChange][y + yChange].value;
                 }
                 if (field[x + xChange][y + yChange].operation === "/") {
-                  greenScore = greenScore / field[x + xChange][y + yChange].value;
+                  greenScore =
+                    greenScore / field[x + xChange][y + yChange].value;
                 }
               }
 
