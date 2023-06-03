@@ -17,6 +17,7 @@
       border: 1px solid #dddddd;
       border-radius: 4px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	  padding-right: 30px
     }
 
     label {
@@ -54,7 +55,10 @@
 	<meta charset="UTF-8"></meta> <!-- allows for cyrillic and other exotic text in console.logs -->
 </head>
 
+
+
 <body onload="init()">
+
 	<form id="myForm">
 		<label for="textfield1">Field width(in x):</label>
 		<input type="text" id="textfield1" name="textfield1" required><br><br>
@@ -65,11 +69,25 @@
 		<label for="checkbox">Singleplayer:</label>
     <input type="checkbox" id="checkbox" name="checkbox"><br><br>
 	
-		<input type="button" value="GO!" onclick="submitForm()">
+		<input type="button" value="GO!" onclick="submitForm()"><br><br>
+		<label id="blueResultlabel"></label>
+		<label id="greenResultlabel"></label>
+		<button id="clearScore" onclick="clearScore()">Clear Score</button>
 	  </form>
  	
 	<canvas id="canvas-id" width=window.innerWidth height=window.innerHeight></canvas>
 	<script>
+		document.getElementById('clearScore').onclick = () => {
+			localStorage.clear();
+	  location.reload();
+		}
+		var scores = JSON.parse(localStorage.getItem('scores'));
+		if(scores == undefined || scores == null){
+			scores = {blue:0, green: 0}
+		}
+		console.log(scores)
+		document.getElementById('greenResultlabel').innerHTML=`Green: ${scores.green} victories`
+		document.getElementById('blueResultlabel').innerHTML=`Blue: ${scores.blue} victories`
 		var gameStart = false
 		function submitForm() {
       var textField1 = document.getElementById("textfield1").value;

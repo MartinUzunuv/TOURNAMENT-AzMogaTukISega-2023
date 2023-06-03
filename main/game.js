@@ -1,5 +1,7 @@
 times = 0;
 
+scorIncrease = false;
+
 function initialize() {
   if (singleplayer) {
     console.log("singleplayer:" + singleplayer);
@@ -141,7 +143,7 @@ function draw() {
       }
     }
     if (gameEnd) {
-      context.fillStyle = "black";
+      context.fillStyle = "white";
       context.fillRect(0, 0, window.innerWidth, window.innerHeight);
       if (blueScore > greenScore) {
         context.fillStyle = "blue";
@@ -151,6 +153,13 @@ function draw() {
           sectorSize * 0.5,
           sectorSize
         );
+        if (!scorIncrease) {
+          localStorage.setItem(
+            "scores",
+            JSON.stringify({ blue: scores.blue + 1, green: scores.green })
+          );
+          scorIncrease = true;
+        }
       } else {
         context.fillStyle = "green";
         context.font = `${30}px serif`;
@@ -159,6 +168,13 @@ function draw() {
           sectorSize * 0.5,
           sectorSize
         );
+        if (!scorIncrease) {
+          localStorage.setItem(
+            "scores",
+            JSON.stringify({ blue: scores.blue, green: scores.green + 1 })
+          );
+          scorIncrease = true;
+        }
       }
     }
   }
@@ -251,14 +267,13 @@ function update() {
   if (gameStart) {
     if (times > 0) {
       if (singleplayer && currentPlayer === 2) {
-        
         for (let x = 0; x < fieldWidth; x++) {
           for (let y = 0; y < fieldHeight; y++) {
             let bestPath = { x: 0, y: 0, value: -10000000 };
             if (field[x][y].type === 2) {
               for (let checkForEndX = -1; checkForEndX < 2; checkForEndX++) {
                 for (let checkForEndY = -1; checkForEndY < 2; checkForEndY++) {
-                  console.log(currentPlayer)
+                  console.log(currentPlayer);
                   try {
                     if (field[x + checkForEndX][y + checkForEndY].type === 0) {
                       if (
@@ -278,7 +293,7 @@ function update() {
                       }
                       if (
                         field[x + checkForEndX][y + checkForEndY].operation ===
-                        "-" &&
+                          "-" &&
                         greenScore -
                           field[x + checkForEndX][y + checkForEndY].value >
                           bestPath.value
@@ -293,7 +308,7 @@ function update() {
                       }
                       if (
                         field[x + checkForEndX][y + checkForEndY].operation ===
-                        "*" &&
+                          "*" &&
                         greenScore *
                           field[x + checkForEndX][y + checkForEndY].value >
                           bestPath.value
@@ -308,7 +323,7 @@ function update() {
                       }
                       if (
                         field[x + checkForEndX][y + checkForEndY].operation ===
-                        "/" &&
+                          "/" &&
                         greenScore /
                           field[x + checkForEndX][y + checkForEndY].value >
                           bestPath.value
@@ -326,21 +341,19 @@ function update() {
                 }
               }
 
-              console.log(bestPath)
+              console.log(bestPath);
 
-              if(bestPath.value == -10000000){
+              if (bestPath.value == -10000000) {
                 gameEnd = true;
-              }else{
-                if(currentPlayer === 2){
-                  console.log("change")
-                field[x][y].type = 2.5;
-                field[bestPath.x][bestPath.y].type = 2
-                greenScore = bestPath.value
-                currentPlayer = 1;
+              } else {
+                if (currentPlayer === 2) {
+                  console.log("change");
+                  field[x][y].type = 2.5;
+                  field[bestPath.x][bestPath.y].type = 2;
+                  greenScore = bestPath.value;
+                  currentPlayer = 1;
                 }
-
               }
-              
             }
           }
         }
